@@ -1,0 +1,13 @@
+# Dataset (keep dir structure)
+dataset/train/*.txt
+dataset/valid/*.txt
+dataset/**/*.jpg
+dataset/valid.txt
+dataset/train.txt
+dataset.tar.xz
+
+# Offstream
+darknet53.conv.74
+
+# Misc
+tmp
