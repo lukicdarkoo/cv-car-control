@@ -20,9 +20,9 @@ git clone --depth=1 https://github.com/lukicdarkoo/cv-car-control.git
 However, if you want to download my pre-trained model you will need [`git lfs`](https://git-lfs.github.com/).
 
 ### Simulation
-Standalone fist detector (without simulation) is located in `controllers/virtual_steering_wheel/wheel_detector.py` and you can run it as:
+Standalone fist detector (without simulation) is located in `./controllers/steering_wheel_controller/wheel_detector.py` and you can run it as:
 ```bash
-python3 ./controllers/virtual_steering_wheel/wheel_detector.py
+python3 ./controllers/steering_wheel_controller/wheel_detector.py
 ```
 
 However, if you want to have a fun and run the simulation, execute the following command:

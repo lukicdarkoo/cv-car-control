@@ -125,18 +125,18 @@ def draw_rectangles(objects, image):
 
 
 def main():
-    project_dir = os.path.dirname(__file__)
+    controller_dir = os.path.dirname(__file__)
     capture = cv2.VideoCapture(0)
 
     # Load YOLO
-    net = cv2.dnn.readNet(
-        '/home/lukic/Downloads/yolov3-tiny_train (4).backup', os.path.join(project_dir, 'yolov3-tiny.cfg'))
+    net = cv2.dnn.readNet(os.path.join(controller_dir, 'yolov3-tiny_train.backup'),
+                          os.path.join(controller_dir, 'yolov3-tiny.cfg'))
     layer_names = net.getLayerNames()
     output_layers = [layer_names[i[0] - 1]
                      for i in net.getUnconnectedOutLayers()]
 
     wheel_image = cv2.imread(os.path.join(
-        project_dir, 'steering_wheel.png'), -1)
+        controller_dir, 'steering_wheel.png'), -1)
 
     while True:
         _, image = capture.read()

@@ -1,10 +1,7 @@
 #VRML_SIM R2020b utf8
 WorldInfo {
   info [
-    "Autonomous Vehicle Simulation"
-    "The simple controller example uses an on-board camera to follow the yellow road lines and a SICK sensor to avoid the obstacles."
-    "The control of the vehicle is done using the driver library."
-    "The vehicle based on the Car PROTO is modelled with realistic physics properties: motor torques, body mass, friction forces, suspensions, etc."
+    "Vritual Steering Wheel Controller"
   ]
   title "City"
   ERP 0.6
@@ -1057,7 +1054,7 @@ TrafficCone {
 TeslaModel3 {
   translation 47.38 0.4 -9.02
   rotation 0 1 0 3.14159
-  controller "virtual_steering_wheel"
+  controller "steering_wheel_controller"
 }
 TrafficCone {
   translation -16.1832 0 45.0952
