@@ -1,3 +1,4 @@
+import os
 import math
 import cv2
 import numpy as np
@@ -65,16 +66,20 @@ def get_wheel_properties(objects):
         right_object = objects[1]
     width_diff = right_object['center_x'] - left_object['center_x']
     height_diff = right_object['center_y'] - left_object['center_y']
-    angle = - math.atan2(height_diff, width_diff)
+    angle = math.atan2(height_diff, width_diff)
     diameter = math.sqrt(width_diff**2 + height_diff**2)
     center_x = (right_object['center_x'] + left_object['center_x']) / 2
     center_y = (right_object['center_y'] + left_object['center_y']) / 2
     return angle, center_x, center_y, diameter
 
 
-def get_objects_from_net(outs, output_image_shape, threshold=0):
+def get_objects_from_net(net, output_layers, image, threshold=0):
     """Parses output from the neural net."""
-    image_height, image_width, _ = output_image_shape
+    blob = cv2.dnn.blobFromImage(
+        image, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
+    net.setInput(blob)
+    outs = net.forward(output_layers)
+    image_height, image_width, _ = image.shape
     objects = []
     for out in outs:
         for detection in out:
@@ -120,25 +125,23 @@ def draw_rectangles(objects, image):
 
 
 def main():
+    project_dir = os.path.dirname(__file__)
     capture = cv2.VideoCapture(0)
 
     # Load YOLO
     net = cv2.dnn.readNet(
-        '/home/lukic/Downloads/yolov3-tiny_train (4).backup', 'yolov3-tiny.cfg')
+        '/home/lukic/Downloads/yolov3-tiny_train (4).backup', os.path.join(project_dir, 'yolov3-tiny.cfg'))
     layer_names = net.getLayerNames()
     output_layers = [layer_names[i[0] - 1]
                      for i in net.getUnconnectedOutLayers()]
 
-    wheel_image = cv2.imread('steering_wheel.png', -1)
+    wheel_image = cv2.imread(os.path.join(
+        project_dir, 'steering_wheel.png'), -1)
 
     while True:
         _, image = capture.read()
-        blob = cv2.dnn.blobFromImage(
-            image, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
-        net.setInput(blob)
-
-        outs = net.forward(output_layers)
-        objects = get_objects_from_net(outs, image.shape)
+        image = cv2.flip(image, 1)
+        objects = get_objects_from_net(net, output_layers, image)
         objects = filter_overlaps(objects)
         objects = filter_by_confidence(objects)
 
@@ -146,9 +149,9 @@ def main():
 
         if len(objects) == 2:
             angle, _, _, diameter = get_wheel_properties(objects)
-            draw_wheel(image, wheel_image, angle, diameter)
+            draw_wheel(image, wheel_image, - angle, diameter)
 
-        cv2.imshow('image', image)
+        cv2.imshow('Virtual steering wheel preview', image)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 

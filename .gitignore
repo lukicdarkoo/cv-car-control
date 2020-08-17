@@ -11,3 +11,4 @@ darknet53.conv.74
 
 # Misc
 tmp
+__pycache__

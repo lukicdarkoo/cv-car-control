@@ -1,4 +1,36 @@
 
+## Quick Start
+
+### Offstream Dependencies
+Here is the list of dependcies:
+- [Webots](https://www.cyberbotics.com/)
+- [OpenCV for Python](https://pypi.org/project/opencv-python/)
+
+In case you use Ubuntu or similar, run:
+```bash
+sudo snap install webots
+pip3 install opencv-contrib-python
+```
+
+### Project Files
+You can clone the project as:
+```bash
+git clone --depth=1 https://github.com/lukicdarkoo/cv-car-control.git
+```
+However, if you want to download my pre-trained model you will need [`git lfs`](https://git-lfs.github.com/).
+
+### Simulation
+Standalone fist detector (without simulation) is located in `controllers/virtual_steering_wheel/wheel_detector.py` and you can run it as:
+```bash
+python3 ./controllers/virtual_steering_wheel/wheel_detector.py
+```
+
+However, if you want to have a fun and run the simulation, execute the following command:
+```bash
+webots ./worlds/city.wbt
+```
+(or simply open `./worlds/city.wbt` in Webots GUI)
+
 ## Training
 
 If you want to improve the model provided within this project, here is an explanation on how to do it.
