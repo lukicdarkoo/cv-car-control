@@ -82,7 +82,7 @@ and your models will be available in `./dataset/backup`.
 
 ### Train on Google Colab
 
-[![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1xQ2eHRcVIB8GCBsp85jxWabH-tavZIE3?usp=sharing)  
+[![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lukicdarkoo/cv-car-control/blob/master/TrainYOLOFistDetector.ipynb)  
 
 In case you don't have GPU it probably a good idea to use Google Colab (click on the badge above).
 After the Google Colab is ready, upload `yolov3-tiny_train.cfg` and `./dataset` folder compressed as `dataset.tar.xz`.
