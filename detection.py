@@ -3,26 +3,28 @@ import cv2
 import numpy as np
 
 
-def clamp(value, min_value, max_value):
-    return max(min(value, max_value), min_value)
-
-
 def draw_overlay(background_image, foreground_image, x_offset, y_offset):
-    # Reference: https://stackoverflow.com/a/14102014/1983050
+    """
+    Draws an image over an image considering transparency.
+    Reference: https://stackoverflow.com/a/14102014/1983050.
+    """
     y1 = y_offset
     y2 = y_offset + foreground_image.shape[0]
     x1 = x_offset
     x2 = x_offset + foreground_image.shape[1]
     alpha_foreground = foreground_image[:, :, 3] / 255.0
-    alpha_bacgrkound = 1.0 - alpha_foreground
+    alpha_background = 1.0 - alpha_foreground
     for c in range(0, 3):
         background_image[y1:y2, x1:x2, c] = \
             alpha_foreground * foreground_image[:, :, c] + \
-            alpha_bacgrkound * background_image[y1:y2, x1:x2, c]
+            alpha_background * background_image[y1:y2, x1:x2, c]
 
 
 def rotate_image(image, angle):
-    # Reference: https://stackoverflow.com/a/9042907/1983050
+    """
+    Rotates an image for an arbitrary angle (radians).
+    Reference: https://stackoverflow.com/a/9042907/1983050.
+    """
     image_center = tuple(np.array(image.shape[1::-1]) / 2)
     rot_mat = cv2.getRotationMatrix2D(
         image_center, angle * 180 / math.pi, 1.0)
@@ -32,6 +34,7 @@ def rotate_image(image, angle):
 
 
 def filter_overlaps(objects):
+    """Filters out objects that overlap leaving the object with highest confidence."""
     filtered_objects = []
     for object_1 in objects:
         accept_object_1 = True
@@ -48,20 +51,13 @@ def filter_overlaps(objects):
 
 
 def filter_by_confidence(objects, n_objects=2):
+    """Leaves `n_objects` objects with the highest confidence."""
     objects = sorted(objects, key=lambda x: x['confidence'], reverse=True)
     return objects[:n_objects]
 
 
-def draw_rectangles(objects, image):
-    for object in objects:
-        x = object['x']
-        y = object['y']
-        w = object['width']
-        h = object['height']
-        cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
-
-
 def get_wheel_properties(objects):
+    """Returns rotation and diameter of the virtual steering wheel based on detected fists."""
     left_object = objects[1]
     right_object = objects[0]
     if objects[0]['center_x'] < objects[1]['center_x']:
@@ -76,28 +72,18 @@ def get_wheel_properties(objects):
     return angle, center_x, center_y, diameter
 
 
-def draw_wheel(background_image, wheel_image, angle, center_x, center_y, diameter):
-    diameter = int(diameter)
-    x = max(center_x - diameter / 2, 0)
-    y = max(center_y - diameter / 2, 0)
-    wheel_x = clamp(x, 0, wheel_image.shape[0] - diameter / 2)
-    wheel_y = clamp(y, 0, wheel_image.shape[1] - diameter / 2)
-    wheel_transformed = cv2.resize(wheel_image, (diameter, diameter))
-    wheel_transformed = rotate_image(wheel_transformed, angle)
-    draw_overlay(background_image, wheel_transformed, int(wheel_x), int(wheel_y))
-
-
-def get_objects_from_net(outs, output_image_shape):
-    height, width, _ = output_image_shape
+def get_objects_from_net(outs, output_image_shape, threshold=0):
+    """Parses output from the neural net."""
+    image_height, image_width, _ = output_image_shape
     objects = []
     for out in outs:
         for detection in out:
             confidence = detection[5]
-            if confidence > 0.5:
-                center_x = int(detection[0] * width)
-                center_y = int(detection[1] * height)
-                width = int(detection[2] * width)
-                height = int(detection[3] * height)
+            if confidence > threshold:
+                center_x = int(detection[0] * image_width)
+                center_y = int(detection[1] * image_height)
+                width = int(detection[2] * image_width)
+                height = int(detection[3] * image_height)
 
                 x = int(center_x - width / 2)
                 y = int(center_y - height / 2)
@@ -113,14 +99,35 @@ def get_objects_from_net(outs, output_image_shape):
     return objects
 
 
+def draw_wheel(background_image, wheel_image, angle, diameter):
+    """Draws steering wheel on the background image and steering wheel properties."""
+    diameter = int(min(diameter, background_image.shape[0]))
+    y = background_image.shape[0] / 2 - diameter / 2
+    x = background_image.shape[1] / 2 - diameter / 2
+    wheel_transformed = cv2.resize(wheel_image, (diameter, diameter))
+    wheel_transformed = rotate_image(wheel_transformed, angle)
+    draw_overlay(background_image, wheel_transformed, int(x), int(y))
+
+
+def draw_rectangles(objects, image):
+    """Draw bounding boxes around the objects."""
+    for object in objects:
+        x = object['x']
+        y = object['y']
+        w = object['width']
+        h = object['height']
+        cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
+
 def main():
     capture = cv2.VideoCapture(0)
 
     # Load YOLO
     net = cv2.dnn.readNet(
-        '/home/lukic/Downloads/yolov3-tiny_train (3).backup', 'yolov3-tiny.cfg')
+        '/home/lukic/Downloads/yolov3-tiny_train (4).backup', 'yolov3-tiny.cfg')
     layer_names = net.getLayerNames()
-    output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+    output_layers = [layer_names[i[0] - 1]
+                     for i in net.getUnconnectedOutLayers()]
 
     wheel_image = cv2.imread('steering_wheel.png', -1)
 
@@ -138,8 +145,8 @@ def main():
         draw_rectangles(objects, image)
 
         if len(objects) == 2:
-            angle, center_x, center_y, diameter = get_wheel_properties(objects)
-            draw_wheel(image, wheel_image, angle, center_x, center_y, diameter)
+            angle, _, _, diameter = get_wheel_properties(objects)
+            draw_wheel(image, wheel_image, angle, diameter)
 
         cv2.imshow('image', image)
         if cv2.waitKey(1) & 0xFF == ord('q'):

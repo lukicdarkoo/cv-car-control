@@ -1,7 +1,9 @@
 
 ## Training
 
-### Make dataset
+If you want to improve the model provided within this project, here is an explanation on how to do it.
+
+### Make Dataset
 Install `labelImg` and open it:
 ```bash
 pip3 install labelImg
@@ -19,7 +21,7 @@ find train -name '*.jpg' > train.txt
 find valid -name '*.jpg' > valid.txt
 ```
 
-### Start training locally
+### Train Locally
 
 If you have GPU and CUDA available then you may prefer to train the YOLO locally.
 
@@ -46,11 +48,13 @@ $HOME/darknet/darknet detector train ./custom.data ../yolov3-tiny_train.cfg ../d
 ```
 and your models will be available in `./dataset/backup`.
 
-### Start training on Google Colab
+### Train on Google Colab
 
-In case you don't have GPU it probably a good idea to use [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1xQ2eHRcVIB8GCBsp85jxWabH-tavZIE3?usp=sharing).
+[![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1xQ2eHRcVIB8GCBsp85jxWabH-tavZIE3?usp=sharing)  
+
+In case you don't have GPU it probably a good idea to use Google Colab (click on the badge above).
 After the Google Colab is ready, upload `yolov3-tiny_train.cfg` and `./dataset` folder compressed as `dataset.tar.xz`.
 
 > You can create `dataset.tar.xz` as `tar -cf ./dataset ./dataset.tar.xz`
 
-Run all cells and after 1 hour of training the model will be ready waiting in `./dataset/backup`.
+Run all cells and after approx. 1 hour of training the model will be ready waiting in `./dataset/backup`.
