@@ -71,8 +71,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.9958085185517026 0.08544585488250146 0.0326251477124915 5.802147028664636
-  position 47.91082213809428 16.583423873087693 19.079565330818394
+  orientation 0.18024163692887404 0.9615932095632695 0.20700592174865437 4.562278389532783
+  position 31.194079112421583 7.58109700387327 -12.883535542414302
   near 1
   follow "vehicle"
   followType "Mounted Shot"
@@ -1055,6 +1055,15 @@ TeslaModel3 {
   translation 47.38 0.4 -9.02
   rotation 0 1 0 3.14159
   controller "steering_wheel_controller"
+  sensorsSlotFront [
+    Camera {
+      translation 5.62562e-06 0.93 -2.12
+      rotation 0 1 0 3.14159
+      fieldOfView 1
+      width 320
+      height 240
+    }
+  ]
 }
 TrafficCone {
   translation -16.1832 0 45.0952

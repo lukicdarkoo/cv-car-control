@@ -1,46 +1,36 @@
 import os
 import cv2
 from vehicle import Driver
-from wheel_detector import get_objects_from_net, filter_overlaps, \
-    filter_by_confidence, draw_rectangles, get_wheel_properties, draw_wheel
+from visual_joystick import VisualJoystick
 
 
-driver = Driver()
-driver.setSteeringAngle(0.2)
-driver.setCruisingSpeed(10)
+def main():
+    # Initialize car
+    driver = Driver()
+    driver.setSteeringAngle(0.2)
+    driver.setCruisingSpeed(10)
+    timestep = int(driver.getBasicTimeStep())
 
-controller_dir = os.path.dirname(__file__)
-capture = cv2.VideoCapture(0)
-wheel_image = cv2.imread(os.path.join(
-    controller_dir, 'steering_wheel.png'), -1)
+    # Initialize camera
+    camera = driver.getCamera('camera')
+    camera.enable(timestep)
 
-# Load YOLO
-net = cv2.dnn.readNet(os.path.join(controller_dir, 'yolov3-tiny_train.backup'),
-                      os.path.join(controller_dir, 'yolov3-tiny.cfg'))
-layer_names = net.getLayerNames()
-output_layers = [layer_names[i[0] - 1]
-                 for i in net.getUnconnectedOutLayers()]
+    # Initialize visual modules
+    joystick = VisualJoystick()
+
+    n_steps = 0
+    while driver.step() != -1:
+        n_steps += 1
+        if n_steps % 20 == 0 and False:
+            is_done, angle = joystick.get_control()
+            if is_done:
+                break
+
+            if angle is not None:
+                driver.setSteeringAngle(angle)
+            else:
+                driver.setSteeringAngle(0)
 
 
-n_steps = 0
-while driver.step() != -1:
-    n_steps += 1
-    if n_steps % 20 == 0:
-        _, image = capture.read()
-        image = cv2.flip(image, 1)
-        objects = get_objects_from_net(net, output_layers, image)
-        objects = filter_overlaps(objects)
-        objects = filter_by_confidence(objects)
-
-        draw_rectangles(objects, image)
-
-        if len(objects) == 2:
-            angle, _, _, diameter = get_wheel_properties(objects)
-            draw_wheel(image, wheel_image, - angle, diameter)
-            driver.setSteeringAngle(angle)
-        else:
-            driver.setSteeringAngle(0)
-
-        cv2.imshow('Virtual steering wheel preview', image)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+if __name__ == '__main__':
+    main()

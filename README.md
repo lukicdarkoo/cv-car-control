@@ -1,7 +1,7 @@
 
 ## Quick Start
 
-### Offstream Dependencies
+#### Dependencies
 Here is the list of dependcies:
 - [Webots](https://www.cyberbotics.com/)
 - [OpenCV for Python](https://pypi.org/project/opencv-python/)
@@ -12,14 +12,14 @@ sudo snap install webots
 pip3 install opencv-contrib-python
 ```
 
-### Project Files
-You can clone the project as:
+#### Project Files
+Clone the project as:
 ```bash
 git clone --depth=1 https://github.com/lukicdarkoo/cv-car-control.git
 ```
-However, if you want to download my pre-trained model you will need [`git lfs`](https://git-lfs.github.com/).
+> Make sure you have [`git lfs`](https://git-lfs.github.com/) installed if you want to get pre-trained model as well.
 
-### Simulation
+#### Simulation
 Standalone fist detector (without simulation) is located in `./controllers/steering_wheel_controller/wheel_detector.py` and you can run it as:
 ```bash
 python3 ./controllers/steering_wheel_controller/wheel_detector.py
@@ -68,7 +68,7 @@ make -j8
 ```
 
 To accelerate training it is usually a good idea to start from pre-trained model.
-Download the pre-trained model as:
+Download the pre-trained model in the project directory:
 ```bash
 wget https://pjreddie.com/media/files/darknet53.conv.74
 ```
